@@ -21,6 +21,9 @@ type datastoreCollector struct {
 
 	capacity         *prometheus.Desc
 	freeSpace        *prometheus.Desc
+	uncommitted      *prometheus.Desc
+	provisioned      *prometheus.Desc
+	usedSpace        *prometheus.Desc
 	accessible       *prometheus.Desc
 	maintenance      *prometheus.Desc
 	overallStatus    *prometheus.Desc
@@ -31,7 +34,7 @@ type datastoreCollector struct {
 }
 
 func NewDatastoreCollector(scraper *scraper.VCenterScraper, cConf config.CollectorConfig) *datastoreCollector {
-	labels := []string{"id", "name", "cluster", "kind"}
+	labels := []string{"id", "name", "cluster", "kind", "datacenter"}
 
 	extraLabels := cConf.DatastoreTagLabels
 	if len(extraLabels) != 0 {
@@ -52,6 +55,15 @@ func NewDatastoreCollector(scraper *scraper.VCenterScraper, cConf config.Collect
 		capacity: prometheus.NewDesc(
 			prometheus.BuildFQName(namespace, datastoreCollectorSubsystem, "total_capacity_bytes"),
 			"datastore capacity in bytes", labels, nil),
+		uncommitted: prometheus.NewDesc(
+			prometheus.BuildFQName(namespace, datastoreCollectorSubsystem, "uncommitted_bytes"),
+			"datastore uncommitted space in bytes", labels, nil),
+		usedSpace: prometheus.NewDesc(
+			prometheus.BuildFQName(namespace, datastoreCollectorSubsystem, "used_space_bytes"),
+			"datastore used space in bytes", labels, nil),
+		provisioned: prometheus.NewDesc(
+			prometheus.BuildFQName(namespace, datastoreCollectorSubsystem, "provisioned_bytes"),
+			"datastore provisioned space in bytes", labels, nil),
 		maintenance: prometheus.NewDesc(
 			prometheus.BuildFQName(namespace, datastoreCollectorSubsystem, "maintenance"),
 			"datastore in maintenance", labels, nil),
@@ -83,6 +95,9 @@ func (c *datastoreCollector) Describe(ch chan<- *prometheus.Desc) {
 	ch <- c.hostMounted
 	ch <- c.hostVmknicActive
 	ch <- c.vmfsInfo
+	ch <- c.uncommitted
+	ch <- c.usedSpace
+	ch <- c.provisioned
 }
 
 func (c *datastoreCollector) Collect(ch chan<- prometheus.Metric) {
@@ -105,7 +120,7 @@ func (c *datastoreCollector) Collect(ch chan<- prometheus.Metric) {
 			extraLabelValues = append(extraLabelValues, objectTags.GetTag(tagCat))
 		}
 
-		labelValues := []string{datastore.Self.ID(), datastore.Name, datastore.DatastoreCluster, datastore.Kind}
+		labelValues := []string{datastore.Self.ID(), datastore.Name, datastore.DatastoreCluster, datastore.Kind, datastore.Datacenter}
 		labelValues = append(labelValues, extraLabelValues...)
 
 		ch <- prometheus.NewMetricWithTimestamp(datastore.Timestamp, prometheus.MustNewConstMetric(
@@ -116,6 +131,15 @@ func (c *datastoreCollector) Collect(ch chan<- prometheus.Metric) {
 		))
 		ch <- prometheus.NewMetricWithTimestamp(datastore.Timestamp, prometheus.MustNewConstMetric(
 			c.freeSpace, prometheus.GaugeValue, float64(datastore.FreeSpace), labelValues...,
+		))
+		ch <- prometheus.NewMetricWithTimestamp(datastore.Timestamp, prometheus.MustNewConstMetric(
+			c.usedSpace, prometheus.GaugeValue, float64(datastore.UsedSpace), labelValues...,
+		))
+		ch <- prometheus.NewMetricWithTimestamp(datastore.Timestamp, prometheus.MustNewConstMetric(
+			c.uncommitted, prometheus.GaugeValue, float64(datastore.Uncommitted), labelValues...,
+		))
+		ch <- prometheus.NewMetricWithTimestamp(datastore.Timestamp, prometheus.MustNewConstMetric(
+			c.provisioned, prometheus.GaugeValue, float64(datastore.Provisioned), labelValues...,
 		))
 		ch <- prometheus.NewMetricWithTimestamp(datastore.Timestamp, prometheus.MustNewConstMetric(
 			c.maintenance, prometheus.GaugeValue, datastore.MaintenanceStatusFloat64(), labelValues...,

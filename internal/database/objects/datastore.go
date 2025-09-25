@@ -11,9 +11,13 @@ type Datastore struct {
 	Parent           *ManagedObjectReference  `json:"parent" redis:"parent"`
 	Name             string                   `json:"name" redis:"name"`
 	DatastoreCluster string                   `json:"datastore_cluster" redis:"datastore_cluster"`
+	Datacenter       string                   `json:"datacenter" redis:"datacenter"`
 	Kind             string                   `json:"kind" redis:"kind"`
 	Capacity         float64                  `json:"capacity" redis:"capacity"`
 	FreeSpace        float64                  `json:"free_space" redis:"free_space"`
+	Uncommitted      float64                  `json:"uncommitted" redis:"uncommitted"`
+	Provisioned      float64                  `json:"provisioned" redis:"provisioned"`
+	UsedSpace        float64                  `json:"used_space" redis:"used_space"`
 	Accessible       bool                     `json:"accessible" redis:"accessible"`
 	Maintenance      string                   `json:"maintenance" redis:"maintenance"`
 	OverallStatus    string                   `json:"overall_status" redis:"overall_status"`

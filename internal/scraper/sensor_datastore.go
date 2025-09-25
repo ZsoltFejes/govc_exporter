@@ -204,12 +204,16 @@ func ConvertToDatastore(ctx context.Context, scraper *VCenterScraper, d mo.Datas
 	if datastore.Parent != nil {
 		parentChain := scraper.DB.GetParentChain(ctx, *datastore.Parent)
 		datastore.DatastoreCluster = parentChain.SPOD
+		datastore.Datacenter = parentChain.DC
 	}
 
 	summary := d.Summary
 	datastore.Accessible = summary.Accessible
 	datastore.Capacity = float64(summary.Capacity)
 	datastore.FreeSpace = float64(summary.FreeSpace)
+	datastore.UsedSpace = float64(datastore.Capacity - datastore.FreeSpace)
+	datastore.Uncommitted = float64(summary.Uncommitted)
+	datastore.Provisioned = float64(datastore.Capacity - datastore.FreeSpace + datastore.Uncommitted)
 	datastore.Maintenance = summary.MaintenanceMode
 
 	for _, hostMountInfo := range d.Host {

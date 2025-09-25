@@ -331,6 +331,7 @@ func ConvertToHost(ctx context.Context, scraper *VCenterScraper, h mo.HostSystem
 		host.CPUCoresTotal = float64(hardware.NumCpuCores)
 		host.CPUThreadsTotal = float64(hardware.NumCpuThreads)
 		host.AvailCPUMhz = float64(int64(hardware.NumCpuCores) * int64(hardware.CpuMhz))
+		host.CPUModel = cleanString(hardware.CpuModel)
 		host.AvailMemBytes = float64(hardware.MemorySize)
 
 		for _, i := range hardware.OtherIdentifyingInfo {

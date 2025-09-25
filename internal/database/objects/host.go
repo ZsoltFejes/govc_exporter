@@ -27,6 +27,7 @@ type Host struct {
 	RebootRequired             bool                      `json:"reboot_required" redis:"reboot_required"`
 	CPUCoresTotal              float64                   `json:"cpu_cores_total" redis:"cpu_cores_total"`
 	CPUThreadsTotal            float64                   `json:"cpu_threads_total" redis:"cpu_threads_total"`
+	CPUModel                   string                    `json:"cpu_model" redis:"cpu_model"`
 	AvailCPUMhz                float64                   `json:"avail_cpu_mhz" redis:"avail_cpu_mhz"`
 	UsedCPUMhz                 float64                   `json:"used_cpu_mhz" redis:"used_cpu_mhz"`
 	AvailMemBytes              float64                   `json:"avail_mem_bytes" redis:"avail_mem_bytes"`

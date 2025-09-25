@@ -58,7 +58,7 @@ func NewEsxCollector(scraper *scraper.VCenterScraper, cConf config.CollectorConf
 		labels = append(labels, extraLabels...)
 	}
 
-	infoLabels := append(slices.Clone(labels), "os_version", "vendor", "model", "asset_tag", "service_tag", "bios_version")
+	infoLabels := append(slices.Clone(labels), "os_version", "vendor", "model", "asset_tag", "service_tag", "bios_version", "cpu_model")
 	sysNumLabels := append(slices.Clone(labels), "sensor_id", "sensor_name", "sensor_type", "sensor_unit")
 	sysStatusLabels := append(slices.Clone(labels), "sensor_type", "sensor_name")
 
@@ -209,7 +209,7 @@ func (c *esxCollector) Collect(ch chan<- prometheus.Metric) {
 
 		labelValues := []string{host.Self.ID(), host.Name, host.Datacenter, host.Cluster}
 		labelValues = append(labelValues, extraLabelValues...)
-		infoLabelValues := append(slices.Clone(labelValues), host.OSVersion, host.Vendor, host.Model, host.AssetTag, host.ServiceTag, host.BiosVersion)
+		infoLabelValues := append(slices.Clone(labelValues), host.OSVersion, host.Vendor, host.Model, host.AssetTag, host.ServiceTag, host.BiosVersion, host.CPUModel)
 
 		for _, health := range host.SystemHealthNumericSensors {
 			sysLabelsValues := append(slices.Clone(labelValues), health.ID, health.Name, health.Type, health.Unit)
