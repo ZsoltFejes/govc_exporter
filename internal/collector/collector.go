@@ -49,6 +49,10 @@ func NewVCCollector(ctx context.Context, conf config.Config, scraper *scraper.VC
 		collectors[helper.NewMatcher("perfhost", "perfesx", "perf-host", "perf-esx")] = NewEsxPerfCollector(scraper, conf.CollectorConfig)
 	}
 
+	if conf.ScraperConfig.DatastorePerf.Enabled {
+		collectors[helper.NewMatcher("perf-datastore", "perfdatastore", "datastore-perf", "datastoreperf")] = NewDatastorePerfCollector(scraper, conf.CollectorConfig)
+	}
+
 	collectors[helper.NewMatcher("spod", "storagepod")] = NewStoragePodCollector(scraper, conf.CollectorConfig)
 	collectors[helper.NewMatcher("scraper")] = NewScraperCollector(scraper)
 

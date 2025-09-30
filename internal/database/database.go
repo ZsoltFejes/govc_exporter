@@ -58,6 +58,7 @@ type Database interface {
 
 	GetAllHostRefs(ctx context.Context) []objects.ManagedObjectReference
 	GetAllVMRefs(ctx context.Context) []objects.ManagedObjectReference
+	GetAllDatastoreRefs(ctx context.Context) []objects.ManagedObjectReference
 	GetAllClusterRefs(ctx context.Context) []objects.ManagedObjectReference
 	GetAllDatacenterRefs(ctx context.Context) []objects.ManagedObjectReference
 

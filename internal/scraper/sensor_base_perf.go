@@ -162,19 +162,35 @@ func (s *BasePerfSensor) QueryVMwareEntiryMetrics(ctx context.Context, scraper *
 
 	sensorStopwatch := sensormetrics.NewSensorStopwatch()
 
-	windowEnd := time.Now().Truncate(s.config.SampleInterval)
-	windowBegin1 := s.lastQueryTime.Add(s.config.SampleInterval)
-	windowBegin2 := windowEnd.Add(-s.config.MaxSampleWindow)
+	interval := s.config.SampleInterval
+	maxWin := s.config.MaxSampleWindow
 
-	var windowBegin time.Time = windowBegin2
-	if windowBegin1.After(windowBegin2) {
-		windowBegin = windowBegin1
+	now := time.Now()
+	// Last completed boundary
+	end := now.Truncate(interval)
+	// Base window start on max window, aligned.
+	start := end.Add(-maxWin).Truncate(interval)
+
+	// If we have a previous successful query, hop to the NEXT slice after it.
+	if !s.lastQueryTime.IsZero() {
+		last := s.lastQueryTime.Truncate(interval)
+		next := last.Add(interval)
+		if next.After(start) {
+			start = next
+		}
 	}
+
+	// Guard: ensure non-empty window and correct order.
+	if !start.Before(end) {
+		// No new slice yet; either skip this run or back off one interval.
+		start = end.Add(-interval)
+	}
+
 	options := []PerfOption{}
 	options = append(options,
 		SetMaxSamples(20),
 		SetInterval(s.config.SampleInterval),
-		SetWindow(windowBegin, windowEnd),
+		SetWindow(start, end),
 		SetMetrics(s.metrics...),
 	)
 
@@ -200,7 +216,7 @@ func (s *BasePerfSensor) QueryVMwareEntiryMetrics(ctx context.Context, scraper *
 	if err != nil {
 		return nil, err
 	}
-	s.lastQueryTime = windowEnd
+	s.lastQueryTime = end
 
 	return metricSeries, nil
 }

@@ -601,6 +601,14 @@ func (db *DB) GetAllVMRefs(ctx context.Context) []objects.ManagedObjectReference
 	return result
 }
 
+func (db *DB) GetAllDatastoreRefs(ctx context.Context) []objects.ManagedObjectReference {
+	result := []objects.ManagedObjectReference{}
+	for ds := range db.GetAllDatastoreIter(ctx) {
+		result = append(result, ds.Self)
+	}
+	return result
+}
+
 func (db *DB) GetAllClusterRefs(ctx context.Context) []objects.ManagedObjectReference {
 	result := []objects.ManagedObjectReference{}
 	for cluster := range db.GetAllClusterIter(ctx) {

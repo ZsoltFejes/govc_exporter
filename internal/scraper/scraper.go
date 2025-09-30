@@ -29,6 +29,7 @@ type VCenterScraper struct {
 	VM               Sensor
 	VMPerf           Sensor
 	Datastore        Sensor
+	DatastorePerf    Sensor
 	SPOD             Sensor
 	ResourcePool     Sensor
 	Tags             Sensor
@@ -101,8 +102,14 @@ func NewVCenterScraper(ctx context.Context, conf config.ScraperConfig, logger *s
 
 	if conf.Datastore.Enabled {
 		scraper.Datastore = NewDatastoreSensor(&scraper, conf.Datastore, logger)
+		if conf.DatastorePerf.Enabled {
+			scraper.DatastorePerf = NewDatastorePerfSensor(&scraper, conf.DatastorePerf, logger)
+		} else {
+			scraper.DatastorePerf = NewNullSensor(DATASTORE_PERF_SENSOR_NAME)
+		}
 	} else {
 		scraper.Datastore = NewNullSensor(DATASTORE_SENSOR_NAME)
+		scraper.DatastorePerf = NewNullSensor(DATASTORE_PERF_SENSOR_NAME)
 	}
 
 	if conf.Host.Enabled {
@@ -242,6 +249,7 @@ func (c *VCenterScraper) SensorList() []Sensor {
 		c.VM,
 		c.HostPerf,
 		c.VMPerf,
+		c.DatastorePerf,
 	}
 }
 

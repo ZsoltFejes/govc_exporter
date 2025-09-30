@@ -82,6 +82,10 @@ func (db *MetricsDB) AddHostMetrics(ctx context.Context, ref objects.ManagedObje
 	return db.Add(ctx, objects.PerfMetricTypesHost, ref, ttl, data...)
 }
 
+func (db *MetricsDB) AddDatastoreMetrics(ctx context.Context, ref objects.ManagedObjectReference, ttl time.Duration, data ...objects.Metric) error {
+	return db.Add(ctx, objects.PerfMetricTypesDatastore, ref, ttl, data...)
+}
+
 func (db *MetricsDB) PopAll(ctx context.Context, pmType objects.PerfMetricTypes, ref objects.ManagedObjectReference) []*objects.Metric {
 	db.Connect(ctx)
 
@@ -122,6 +126,10 @@ func (db *MetricsDB) PopAllVmMetrics(ctx context.Context, ref objects.ManagedObj
 	return db.PopAll(ctx, objects.PerfMetricTypesVirtualMachine, ref)
 }
 
+func (db *MetricsDB) PopAllDatastoreMetrics(ctx context.Context, ref objects.ManagedObjectReference) []*objects.Metric {
+	return db.PopAll(ctx, objects.PerfMetricTypesDatastore, ref)
+}
+
 func (db *MetricsDB) PopAllHostMetricsIter(ctx context.Context, ref objects.ManagedObjectReference) iter.Seq[objects.Metric] {
 	return func(yield func(objects.Metric) bool) {
 		for _, v := range db.PopAllHostMetrics(ctx, ref) {
@@ -135,6 +143,16 @@ func (db *MetricsDB) PopAllHostMetricsIter(ctx context.Context, ref objects.Mana
 func (db *MetricsDB) PopAllVmMetricsIter(ctx context.Context, ref objects.ManagedObjectReference) iter.Seq[objects.Metric] {
 	return func(yield func(objects.Metric) bool) {
 		for _, v := range db.PopAllVmMetrics(ctx, ref) {
+			if v != nil && !yield(*v) {
+				return
+			}
+		}
+	}
+}
+
+func (db *MetricsDB) PopAllDatastoreMetricsIter(ctx context.Context, ref objects.ManagedObjectReference) iter.Seq[objects.Metric] {
+	return func(yield func(objects.Metric) bool) {
+		for _, v := range db.PopAllDatastoreMetrics(ctx, ref) {
 			if v != nil && !yield(*v) {
 				return
 			}

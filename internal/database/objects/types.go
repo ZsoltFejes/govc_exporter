@@ -21,6 +21,7 @@ const (
 const (
 	PerfMetricTypesVirtualMachine = PerfMetricTypes("PerfMetricsVirtualMachine")
 	PerfMetricTypesHost           = PerfMetricTypes("PerfMetricsHost")
+	PerfMetricTypesDatastore      = PerfMetricTypes("PerfMetricsDatastore")
 )
 
 func (t ManagedObjectTypes) String() string {

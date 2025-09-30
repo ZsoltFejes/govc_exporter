@@ -90,6 +90,16 @@ func LoadConfig() config.Config {
 	a.Flag("scraper.host.perf.extra_metric", "Collect additional host perf metrics").StringsVar(&cfg.ScraperConfig.HostPerf.ExtraMetrics)
 	a.Flag("scraper.host.perf.filter", "Filters to modify/cleanup perf metrics and reduce the amount of metrics exported.").StringsVar(&cfg.ScraperConfig.HostPerf.Filters)
 
+	//scraper.datastore.perf
+	a.Flag("scraper.datastore.perf", "Enable datastore performance metrics").Default("True").BoolVar(&cfg.ScraperConfig.DatastorePerf.Enabled)
+	a.Flag("scraper.datastore.perf.max_age", "time in seconds performance metrics are cached").Default("20m").DurationVar(&cfg.ScraperConfig.DatastorePerf.MaxAge)
+	a.Flag("scraper.datastore.perf.refresh_interval", "perf metrics refresh interval").Default("60s").DurationVar(&cfg.ScraperConfig.DatastorePerf.RefreshInterval)
+	a.Flag("scraper.datastore.perf.max_sample_window", "max window metrics are collected").Default("10m").DurationVar(&cfg.ScraperConfig.DatastorePerf.MaxSampleWindow)
+	a.Flag("scraper.datastore.perf.sample_interval", "time between metrics").Default("300s").DurationVar(&cfg.ScraperConfig.DatastorePerf.SampleInterval)
+	a.Flag("scraper.datastore.perf.default_metrics", "Collect default datastore perf metrics").Default("True").BoolVar(&cfg.ScraperConfig.DatastorePerf.DefaultMetrics)
+	a.Flag("scraper.datastore.perf.extra_metric", "Collect additional datastore perf metrics").StringsVar(&cfg.ScraperConfig.DatastorePerf.ExtraMetrics)
+	a.Flag("scraper.datastore.perf.filter", "Filters to modify/cleanup perf metrics and reduce the amount of metrics exported.").StringsVar(&cfg.ScraperConfig.DatastorePerf.Filters)
+
 	//scraper.repool
 	a.Flag("scraper.repool", "Enable resource pool sensor").Default("True").BoolVar(&cfg.ScraperConfig.ResourcePool.Enabled)
 	a.Flag("scraper.repool.max_age", "time in seconds resource pools are cached").Default("2m").DurationVar(&cfg.ScraperConfig.ResourcePool.MaxAge)

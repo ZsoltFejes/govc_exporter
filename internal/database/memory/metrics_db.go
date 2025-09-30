@@ -115,6 +115,10 @@ func (db *MetricsDB) AddHostMetrics(ctx context.Context, ref objects.ManagedObje
 	return db.Add(ctx, objects.PerfMetricTypesHost, ref, ttl, data...)
 }
 
+func (db *MetricsDB) AddDatastoreMetrics(ctx context.Context, ref objects.ManagedObjectReference, ttl time.Duration, data ...objects.Metric) error {
+	return db.Add(ctx, objects.PerfMetricTypesDatastore, ref, ttl, data...)
+}
+
 func (db *MetricsDB) PopAll(ctx context.Context, pmType objects.PerfMetricTypes, ref objects.ManagedObjectReference) []*objects.Metric {
 	return db.Table(pmType, ref).PopAll()
 
@@ -125,8 +129,16 @@ func (db *MetricsDB) PopAllHostMetrics(ctx context.Context, ref objects.ManagedO
 	return db.Table(objects.PerfMetricTypesHost, ref).PopAll()
 }
 
+func (db *MetricsDB) PopAllDatastoreMetrics(ctx context.Context, ref objects.ManagedObjectReference) []*objects.Metric {
+	return db.Table(objects.PerfMetricTypesDatastore, ref).PopAll()
+}
+
 func (db *MetricsDB) PopAllVmMetrics(ctx context.Context, ref objects.ManagedObjectReference) []*objects.Metric {
 	return db.Table(objects.PerfMetricTypesVirtualMachine, ref).PopAll()
+}
+
+func (db *MetricsDB) PopAllDatastoreMetricsIter(ctx context.Context, ref objects.ManagedObjectReference) iter.Seq[objects.Metric] {
+	return db.Table(objects.PerfMetricTypesDatastore, ref).PopAllIter()
 }
 
 func (db *MetricsDB) PopAllHostMetricsIter(ctx context.Context, ref objects.ManagedObjectReference) iter.Seq[objects.Metric] {

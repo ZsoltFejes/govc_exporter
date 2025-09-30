@@ -36,6 +36,7 @@ type ScraperConfig struct {
 	Tags               TagsSensorConfig
 	VirtualMachine     SensorConfig
 	VirtualMachinePerf PerfSensorConfig
+	DatastorePerf      PerfSensorConfig
 	// CleanInterval  time.Duration
 	ClientPoolSize int
 }
@@ -266,6 +267,14 @@ func DefaultScraperConfig() ScraperConfig {
 			SampleInterval:  20 * time.Second,
 			DefaultMetrics:  true,
 		},
+		DatastorePerf: PerfSensorConfig{
+			Enabled:         true,
+			MaxAge:          10 * time.Minute,
+			RefreshInterval: 60 * time.Second,
+			MaxSampleWindow: 10 * time.Minute,
+			SampleInterval:  300 * time.Second,
+			DefaultMetrics:  true,
+		},
 		Backend: BackendConfig{
 			Type: "memory",
 			Redis: RedisConfig{
@@ -335,6 +344,10 @@ when it queries the hosts`)
 
 	if err := c.VirtualMachinePerf.Validate(); err != nil {
 		return fmt.Errorf("invalid vmperf config: %v", err)
+	}
+
+	if err := c.DatastorePerf.Validate(); err != nil {
+		return fmt.Errorf("invalid datastoreperf config: %v", err)
 	}
 	return nil
 }

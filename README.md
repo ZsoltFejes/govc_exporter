@@ -79,7 +79,7 @@ export VC_PASSWORD=FIXME
 
 ```
 govc_exporter --help
-usage: exporter --scraper.vc.url=SCRAPER.VC.URL --scraper.vc.username=SCRAPER.VC.USERNAME --scraper.vc.password=SCRAPER.VC.PASSWORD [<flags>]
+usage: govc-exporter --scraper.vc.url=SCRAPER.VC.URL --scraper.vc.username=SCRAPER.VC.USERNAME --scraper.vc.password=SCRAPER.VC.PASSWORD [<flags>]
 
 Prometheus vCenter exporter
 
@@ -157,6 +157,22 @@ Flags:
       --scraper.host.perf.extra_metric=SCRAPER.HOST.PERF.EXTRA_METRIC ...  
                                  Collect additional host perf metrics
       --scraper.host.perf.filter=SCRAPER.HOST.PERF.FILTER ...  
+                                 Filters to modify/cleanup perf metrics and reduce the amount of metrics exported.
+      --[no-]scraper.datastore.perf  
+                                 Enable datastore performance metrics
+      --scraper.datastore.perf.max_age=20m  
+                                 time in seconds performance metrics are cached
+      --scraper.datastore.perf.refresh_interval=60s  
+                                 perf metrics refresh interval
+      --scraper.datastore.perf.max_sample_window=10m  
+                                 max window metrics are collected
+      --scraper.datastore.perf.sample_interval=300s  
+                                 time between metrics
+      --[no-]scraper.datastore.perf.default_metrics  
+                                 Collect default datastore perf metrics
+      --scraper.datastore.perf.extra_metric=SCRAPER.DATASTORE.PERF.EXTRA_METRIC ...  
+                                 Collect additional datastore perf metrics
+      --scraper.datastore.perf.filter=SCRAPER.DATASTORE.PERF.FILTER ...  
                                  Filters to modify/cleanup perf metrics and reduce the amount of metrics exported.
       --[no-]scraper.repool      Enable resource pool sensor
       --scraper.repool.max_age=2m  
