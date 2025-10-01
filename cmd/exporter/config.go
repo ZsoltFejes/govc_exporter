@@ -74,11 +74,13 @@ func LoadConfig() config.Config {
 	a.Flag("scraper.datastore", "Enable datastore sensor").Default("True").BoolVar(&cfg.ScraperConfig.Datastore.Enabled)
 	a.Flag("scraper.datastore.max_age", "time in seconds datastores are cached").Default("2m").DurationVar(&cfg.ScraperConfig.Datastore.MaxAge)
 	a.Flag("scraper.datastore.refresh_interval", "interval datastores are refreshed").Default("55s").DurationVar(&cfg.ScraperConfig.Datastore.RefreshInterval)
+	a.Flag("scraper.datastore.filter", "Filters to reduce the number of datastores exported based on datastore name (regex)").Default("").StringsVar(&cfg.ScraperConfig.Datastore.Filters)
 
 	//scraper.host
 	a.Flag("scraper.host", "Enable host sensor").Default("True").BoolVar(&cfg.ScraperConfig.Host.Enabled)
 	a.Flag("scraper.host.max_age", "time in seconds hosts are cached").Default("1m").DurationVar(&cfg.ScraperConfig.Host.MaxAge)
 	a.Flag("scraper.host.refresh_interval", "interval hosts are refreshed").Default("25s").DurationVar(&cfg.ScraperConfig.Host.RefreshInterval)
+	a.Flag("scraper.host.filter", "Filters to reduce the number of hosts exported based on host name (regex)").Default("").StringsVar(&cfg.ScraperConfig.Host.Filters)
 
 	//scraper.host.perf
 	a.Flag("scraper.host.perf", "Enable host performance metrics").Default("True").BoolVar(&cfg.ScraperConfig.HostPerf.Enabled)
@@ -123,6 +125,7 @@ func LoadConfig() config.Config {
 	a.Flag("collector.vm.legacy", "Collect legacy metrics. Should all be available via scraper.vm.perf").Default("false").BoolVar(&cfg.CollectorConfig.VMLegacyMetrics)
 	a.Flag("collector.vm.disk", "Collect extra vm disk metrics").Default("false").BoolVar(&cfg.CollectorConfig.VMAdvancedStorageMetrics)
 	a.Flag("collector.vm.network", "Collect extra vm network metrics").Default("false").BoolVar(&cfg.CollectorConfig.VMAdvancedNetworkMetrics)
+	a.Flag("scraper.vm.filter", "Filters to reduce the number of virtual machines exported based on vm name (regex)").Default("").StringsVar(&cfg.ScraperConfig.VirtualMachine.Filters)
 
 	// scraper.vm.perf
 	a.Flag("scraper.vm.perf", "Enable vm performance metrics").Default("False").BoolVar(&cfg.ScraperConfig.VirtualMachinePerf.Enabled)

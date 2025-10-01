@@ -181,6 +181,8 @@ func (s *HostSensor) refresh(ctx context.Context, scraper *VCenterScraper) error
 		return err
 	}
 
+	hosts = s.FilterHosts(hosts)
+
 	for _, host := range hosts {
 		err := scraper.DB.SetHost(ctx, host, s.config.MaxAge)
 		if err != nil {
@@ -290,6 +292,48 @@ func (s *HostSensor) GetLatestMetrics() []sensormetrics.SensorMetric {
 			Unit:       "boolean",
 		},
 	)
+}
+
+func (s *HostSensor) FilterHosts(hosts []objects.Host) []objects.Host {
+	var filtered []objects.Host
+	if len(s.config.Filters) == 0 || (len(s.config.Filters) == 1 && strings.TrimSpace(s.config.Filters[0]) == "") {
+		return hosts
+	} else {
+		for _, host := range hosts {
+			matcher := helper.NewMatcher(s.config.Filters...)
+			match, err := matcher.MatchRegex(host.Name)
+			if err != nil {
+				s.SensorLogger.Error("Error matching host name with regex", "err", err, "host", host.Name, "regex", matcher.Keywords)
+				continue
+			}
+			if match {
+				continue
+			}
+			filtered = append(filtered, host)
+		}
+	}
+	return filtered
+}
+
+func (s *VirtualMachineSensor) FilterVirtualMachines(vms []objects.VirtualMachine) []objects.VirtualMachine {
+	var filtered []objects.VirtualMachine
+	if len(s.config.Filters) == 0 || (len(s.config.Filters) == 1 && strings.TrimSpace(s.config.Filters[0]) == "") {
+		return vms
+	} else {
+		for _, vm := range vms {
+			matcher := helper.NewMatcher(s.config.Filters...)
+			match, err := matcher.MatchRegex(vm.Name)
+			if err != nil {
+				s.SensorLogger.Error("Error matching virtual machine name with regex", "err", err, "virtual_machine", vm.Name, "regex", matcher.Keywords)
+				continue
+			}
+			if match {
+				continue
+			}
+			filtered = append(filtered, vm)
+		}
+	}
+	return filtered
 }
 
 func ConvertToHost(ctx context.Context, scraper *VCenterScraper, h mo.HostSystem, t time.Time) objects.Host {

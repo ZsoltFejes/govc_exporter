@@ -46,6 +46,7 @@ type SensorConfig struct {
 	MaxAge          time.Duration
 	RefreshInterval time.Duration
 	RefreshTimeout  time.Duration
+	Filters         []string
 }
 
 type PerfSensorConfig struct {

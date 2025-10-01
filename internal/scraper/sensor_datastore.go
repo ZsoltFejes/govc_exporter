@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"math/rand"
 	"reflect"
+	"strings"
 	"sync"
 	"time"
 
@@ -63,6 +64,8 @@ func (s *DatastoreSensor) refresh(ctx context.Context, scraper *VCenterScraper) 
 	if err != nil {
 		return err
 	}
+
+	datastores = s.FilterDatastores(datastores)
 
 	for _, ds := range datastores {
 		oDS := ConvertToDatastore(ctx, scraper, ds, time.Now())
@@ -175,6 +178,28 @@ func (s *DatastoreSensor) GetLatestMetrics() []sensormetrics.SensorMetric {
 			Unit:       "boolean",
 		},
 	)
+}
+
+func (s *DatastoreSensor) FilterDatastores(datastores []mo.Datastore) []mo.Datastore {
+	var filtered []mo.Datastore
+	if len(s.config.Filters) == 0 || (len(s.config.Filters) == 1 && strings.TrimSpace(s.config.Filters[0]) == "") {
+		s.SensorLogger.Debug("No datastore filters configured, returning all datastores")
+		return datastores
+	} else {
+		for _, ds := range datastores {
+			matcher := helper.NewMatcher(s.config.Filters...)
+			match, err := matcher.MatchRegex(ds.Name)
+			if err != nil {
+				s.SensorLogger.Error("Error matching datastore name with regex", "err", err, "datastore", ds.Name, "regex", matcher.Keywords)
+				continue
+			}
+			if match {
+				continue
+			}
+			filtered = append(filtered, ds)
+		}
+	}
+	return filtered
 }
 
 func ConvertToDatastore(ctx context.Context, scraper *VCenterScraper, d mo.Datastore, t time.Time) objects.Datastore {

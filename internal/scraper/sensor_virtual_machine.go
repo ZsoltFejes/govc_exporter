@@ -70,6 +70,8 @@ func (s *VirtualMachineSensor) refresh(ctx context.Context, scraper *VCenterScra
 		return err
 	}
 
+	vms = s.FilterVirtualMachines(vms)
+
 	for _, vm := range vms {
 		err := scraper.DB.SetVM(ctx, vm, s.config.MaxAge)
 		if err != nil {
@@ -298,6 +300,27 @@ func (s *VirtualMachineSensor) GetLatestMetrics() []sensormetrics.SensorMetric {
 			Unit:       "boolean",
 		},
 	)
+}
+
+func (s *VirtualMachineSensor) FilterVirtualMachines(vms []objects.VirtualMachine) []objects.VirtualMachine {
+	var filtered []objects.VirtualMachine
+	if len(s.config.Filters) == 0 || (len(s.config.Filters) == 1 && strings.TrimSpace(s.config.Filters[0]) == "") {
+		return vms
+	} else {
+		for _, vm := range vms {
+			matcher := helper.NewMatcher(s.config.Filters...)
+			match, err := matcher.MatchRegex(vm.Name)
+			if err != nil {
+				s.SensorLogger.Error("Error matching virtual machine name with regex", "err", err, "virtual_machine", vm.Name, "regex", matcher.Keywords)
+				continue
+			}
+			if match {
+				continue
+			}
+			filtered = append(filtered, vm)
+		}
+	}
+	return filtered
 }
 
 func ConvertToVirtualMachine(ctx context.Context, sensor *VirtualMachineSensor, scraper *VCenterScraper, vm mo.VirtualMachine, t time.Time) objects.VirtualMachine {
