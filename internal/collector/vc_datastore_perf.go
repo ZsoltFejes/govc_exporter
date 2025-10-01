@@ -18,7 +18,7 @@ type datastorePerfCollector struct {
 }
 
 func NewDatastorePerfCollector(scraper *scraper.VCenterScraper, cConf config.CollectorConfig) *datastorePerfCollector {
-	labels := []string{"id", "name", "datacenter"}
+	labels := []string{"id", "name", "cluster", "datastore_kind", "datacenter"}
 	extraLabels := cConf.DatastoreTagLabels
 	if len(extraLabels) != 0 {
 		labels = append(labels, extraLabels...)
@@ -59,7 +59,7 @@ func (c *datastorePerfCollector) Collect(ch chan<- prometheus.Metric) {
 			extraLabelValues = append(extraLabelValues, objectTags.GetTag(tagCat))
 		}
 
-		labelValues := []string{datastore.Self.ID(), datastore.Name, datastore.Datacenter}
+		labelValues := []string{datastore.Self.ID(), datastore.Name, datastore.DatastoreCluster, datastore.Kind, datastore.Datacenter}
 		labelValues = append(labelValues, extraLabelValues...)
 
 		for metric := range c.scraper.MetricsDB.PopAllDatastoreMetricsIter(ctx, datastore.Self) {
