@@ -315,27 +315,6 @@ func (s *HostSensor) FilterHosts(hosts []objects.Host) []objects.Host {
 	return filtered
 }
 
-func (s *VirtualMachineSensor) FilterVirtualMachines(vms []objects.VirtualMachine) []objects.VirtualMachine {
-	var filtered []objects.VirtualMachine
-	if len(s.config.Filters) == 0 || (len(s.config.Filters) == 1 && strings.TrimSpace(s.config.Filters[0]) == "") {
-		return vms
-	} else {
-		for _, vm := range vms {
-			matcher := helper.NewMatcher(s.config.Filters...)
-			match, err := matcher.MatchRegex(vm.Name)
-			if err != nil {
-				s.SensorLogger.Error("Error matching virtual machine name with regex", "err", err, "virtual_machine", vm.Name, "regex", matcher.Keywords)
-				continue
-			}
-			if match {
-				continue
-			}
-			filtered = append(filtered, vm)
-		}
-	}
-	return filtered
-}
-
 func ConvertToHost(ctx context.Context, scraper *VCenterScraper, h mo.HostSystem, t time.Time) objects.Host {
 	self := objects.NewManagedObjectReferenceFromVMwareRef(h.Self)
 
